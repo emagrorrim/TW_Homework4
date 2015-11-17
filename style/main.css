@@ -13,13 +13,11 @@ p {
 }
 
 #searchBar {
-  position: fixed;
   background-color: rgb(249, 249, 249);
   margin: 0px auto;
   width: 90%;
   padding-top: 1.5%;
   padding-bottom: 1.5%;
-  margin-left: 5%;
 }
 
 #textField {
@@ -31,9 +29,6 @@ p {
   text-indent: 1em;
 }
 
-#list {
-  padding-top: 6%;
-}
 
 #listItemTitle {
   text-align: left;
