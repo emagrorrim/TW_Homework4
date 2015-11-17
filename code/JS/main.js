@@ -4,38 +4,37 @@ $(document).ready(function(){
 });
 function inputChange(){
   // Search Word
-  resetSearch();
+  resetSearch($('#textField').val());
   searchWords($('#textField').val());
 };
 
-function resetSearch() {
-  var titles = document.getElementsByTagName("p");
-  var j = 0;
-  for (var i = 0; i < titles.length; i++) {
-    if (titles[i].id == "listItemTitle") {
-      // str = "<span id=\"purpleFont\">";
-      // titles[i].innerHTML = titles[i].innerHTML.replace(str,"");
-      // titles[i].innerHTML = titles[i].innerHTML.replace("</span>","");
-      titles[i].innerHTML = data[j].title;
-      j++;
-    }
-  }
+function resetSearch(str) {
+   $("#list").empty();
+   var listdata = [];
+  //  for (var i = 0; i < data.length; i++) {
+  //    listdata.push(data[i]);
+  //  }
+   for (var i = 0; i < data.length; i++) {
+     if (data[i].title.toLowerCase().indexOf(str.toLowerCase()) != -1) {
+       listdata.push(data[i]);
+     }
+   }
+   makelist(listdata);
 }
 
 
 function searchWords(str) {
-  var titles = document.getElementsByTagName("p");
+  var titles = document.getElementsByTagName("div");
   for (var i = 0; i < titles.length; i++) {
-    if (titles[i].id == "listItemTitle") {
-      var reg = "/" + str + "/ig"
-      titles[i].innerHTML = titles[i].innerHTML.replace(eval("/" + str + "/ig"),"<span id='purpleFont'>" + str + "</span>");
-
+    if (titles[i].id == "listItem") {
+      var title = titles[i].firstChild;
+      var reg = "/" + str + "/ig";
+      title.innerHTML = title.innerHTML.replace(eval("/" + str + "/ig"),"<span id='purpleFont'>" + str + "</span>");
     }
   }
 }
 
-function makelist() {
-  var listData = data;
+function makelist(listData) {
   for(var i = 0 ; i < listData.length ; i++){
     var listItem1 = document.createElement("p");
     listItem1.id = "listItemTitle";
@@ -47,11 +46,14 @@ function makelist() {
     var line = document.createElement("div");
     line.id = "line";
     var list = document.getElementById("list");
-    list.appendChild(listItem1);
-    list.appendChild(listItem2);
+    var item = document.createElement("div");
+    item.id = "listItem";
+    item.appendChild(listItem1);
+    item.appendChild(listItem2);
     if (i != listData.length-1) {
-      list.appendChild(line);
+      item.appendChild(line);
     }
+    list.appendChild(item);
   }
 }
 
@@ -63,7 +65,7 @@ function loadJson() {
       for (var i = 0;i < objects.length;i++) {
         data.push(objects[i]);
       }
-      makelist();
+      makelist(data);
     }
   };
   xhttp.open("GET", "bookmarks.json", true);
