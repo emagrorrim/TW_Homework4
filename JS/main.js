@@ -2,72 +2,73 @@ var data = [];
 $(document).ready(function(){
   loadJson();
 });
+
+function loadJson() {
+  $.get("bookmarks.json", function(response){
+      data = response;
+      makelist(data);
+    });
+}
+
 function inputChange(){
   // Search Word
-  resetSearch($('#textField').val());
-  searchWords($('#textField').val());
+  var str = $('#textField').val()
+  resetList(str);
 };
 
-function resetSearch(str) {
+function resetList(str) {
    $("#list").empty();
    var listdata = [];
-  //  for (var i = 0; i < data.length; i++) {
-  //    listdata.push(data[i]);
-  //  }
    for (var i = 0; i < data.length; i++) {
      if (data[i].title.toLowerCase().indexOf(str.toLowerCase()) != -1) {
        listdata.push(data[i]);
      }
    }
    makelist(listdata);
+   searchWords(str);
 }
 
 
 function searchWords(str) {
-  var titles = document.getElementsByTagName("div");
-  for (var i = 0; i < titles.length; i++) {
-    if (titles[i].id == "listItem") {
-      var title = titles[i].firstChild;
-      var reg = "/" + str + "/ig";
-      title.innerHTML = title.innerHTML.replace(eval("/" + str + "/ig"),"<span id='purpleFont'>" + str + "</span>");
+  $("div#listItem").each(function(){
+    var title = $(this).find("#listItemTitle");
+    title.html(title.html().replace(eval("/" + " " + "/ig"),"&nbsp;"));
+    str = str.replace(eval("/" + " " + "/ig"),"&nbsp;");
+    var indexs = title.html().match(eval("/" + str + "/ig"));
+    indexs = uniqueArray(indexs);
+    for (var i = 0; i < indexs.length; i++) {
+      indexs.indexOf(indexs[i])
+      title.html(title.html().replace(eval("/" + indexs[i] + "/g"),"<span id='purpleFont'>" + indexs[i] + "</span>"));
     }
+  });
+}
+
+function uniqueArray(array){
+  var n = [];
+  for(var i = 0; i < array.length; i++){
+    if (n.indexOf(array[i]) == -1) n.push(array[i]);
   }
+  return n;
 }
 
 function makelist(listData) {
+  $("#searchBar").find("b").html(listData.length);
   for(var i = 0 ; i < listData.length ; i++){
-    var listItem1 = document.createElement("p");
-    listItem1.id = "listItemTitle";
-    listItem1.innerHTML = listData[i].title;
-    var listItem2 = document.createElement("p");
-    listItem2.id = "listItemCreated";
+    var listItem1 = $("<p></p>").text(listData[i].title);
+    listItem1.attr('id','listItemTitle');
     var date = new Date(parseInt(listData[i].created + "000"));
-    listItem2.innerHTML = "Created@"+date.getFullYear() + "-"+(parseInt(date.getMonth())+1) + "-" + date.getDate();
-    var line = document.createElement("div");
-    line.id = "line";
-    var list = document.getElementById("list");
-    var item = document.createElement("div");
-    item.id = "listItem";
-    item.appendChild(listItem1);
-    item.appendChild(listItem2);
+    var listItem2 = $("<p></p>").text(
+      "Created@" + date.getFullYear()
+      + "-" + (parseInt(date.getMonth())+1)
+      + "-" + date.getDate()
+    );
+    listItem2.attr('id','listItemCreated');
+    var line = $("<div></div>").attr('id','line');
+    var item = $("<div></div>").attr('id','listItem');
+    item.append(listItem1,listItem2);
     if (i != listData.length-1) {
-      item.appendChild(line);
+      item.append(line);
     }
-    list.appendChild(item);
+    $("#list").append(item);
   }
-}
-
-function loadJson() {
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (xhttp.readyState == 4 && xhttp.status == 200) {
-      var objects = eval ("(" + xhttp.responseText + ")");
-      for (var i = 0;i < objects.length;i++) {
-        data.push(objects[i]);
-      }
-      makelist(data);
-    }
-  };
-  xhttp.open("GET", "bookmarks.json", true);
-  xhttp.send();
 }
